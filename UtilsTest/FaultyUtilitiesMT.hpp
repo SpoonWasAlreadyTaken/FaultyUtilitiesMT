@@ -59,7 +59,7 @@ public:
 	
 
 	template <typename F, typename... Args>
-	inline void AddTask(F&& f, Args&&... args) // adds a function to the task queue for threads to execute
+	inline void AddTask(F&& f, Args&&... args) // adds a function to the task queue for threads to execute, to pass a templated function must pass the template values in <> example: func<int, int>
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		taskQueue.emplace(std::bind(std::forward<F>(f), std::forward<Args>(args)...));

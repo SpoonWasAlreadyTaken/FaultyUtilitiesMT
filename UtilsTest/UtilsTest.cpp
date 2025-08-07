@@ -13,15 +13,17 @@ using std::chrono::milliseconds;
 
 void GenericFunction(int nr);
 
-void RandomNumber(int min, int max);
+template <typename MIN, typename MAX>
+void RandomNumber(MIN min, MAX max);
 
-TaskSystem mt(0);
+TaskSystem mt(30);
 
-int taskCount = 1000;
+int taskCount = 100000;
+int taskSize = 10000;
 
 int main()
 {
-	std::cout << "Tasks: " << taskCount << "\n";
+	std::cout << "Tasks: " << taskCount << " Task Size: " << taskSize << "\n";
 
 
 	auto t1 = high_resolution_clock::now();
@@ -38,14 +40,14 @@ int main()
 	t1 = high_resolution_clock::now();
 	for (int i = 0; i < taskCount; i++)
 	{
-		mt.AddTask(RandomNumber, -500, 500);
+		mt.AddTask(RandomNumber<int, int> , -500, 500);
 	}
 
 	mt.WaitForComplete();
 
 	t2 = high_resolution_clock::now();
 	ms_int = duration_cast<milliseconds>(t2 - t1);
-	std::cout << "Multi Thread Time: " << ms_int.count() << " milliseconds\n" << "Thread Count: " << (int)mt.ActiveThreads() << "\n";
+	std::cout << "Multi Thread Time: " << ms_int.count() << " milliseconds\n" << "Thread Count: " << (int)mt.ActiveThreads() << "/" << (int)mt.MaxThreads() << "\n";
 }
 
 void GenericFunction(int nr)
@@ -53,9 +55,10 @@ void GenericFunction(int nr)
 	nr = nr * nr;
 }
 
-void RandomNumber(int min, int max) // generates a random number based on input parameters
+template <typename MIN, typename MAX>
+void RandomNumber(MIN min, MAX max) // generates a random number based on input parameters
 {
-	for (int i = 0; i < 10000; i++)
+	for (int i = 0; i < taskSize; i++)
 	{
 		std::uniform_int_distribution<> distr(min, max);
 	}
