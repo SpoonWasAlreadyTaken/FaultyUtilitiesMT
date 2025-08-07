@@ -14,10 +14,9 @@ private:
 	uint8_t activeThreads;
 
 	std::vector<std::thread> workers;
-	bool stopped;
+	bool running;
 
 	std::mutex mutex;
-	std::condition_variable cv;
 
 	std::queue<std::function<void()>> taskQueue;
 
@@ -29,7 +28,7 @@ public:
 	{
 		maxThreads = std::thread::hardware_concurrency();
 		workers.reserve(maxThreads);
-		stopped = false;
+		running = true;
 
 		if (toStart <= maxThreads && toStart > 0) activeThreads = toStart;
 		else activeThreads = maxThreads;
@@ -41,12 +40,12 @@ public:
 	{
 		{
 			std::unique_lock<std::mutex> lock(mutex);
-			stopped = true;
+			running = false;
 		}
 
-		cv.notify_all();
 		for (uint8_t i = 0; i < workers.size(); i++) workers[i].join();
 	}
+
 
 	void AddWorker() // adds a single worker
 	{
@@ -55,49 +54,43 @@ public:
 		activeThreads++;
 	}
 
-	uint8_t MaxThreads() const // returns max thread count
-	{
-		return maxThreads;
-	}
-
-	uint8_t ActiveThreads() const // returns active thread count
-	{
-		return activeThreads;
-	}
-
-	uint8_t WorkerCount() const
-	{
-		return workers.size();
-	}
-
+	uint8_t MaxThreads() const { return maxThreads; } // returns max thread count
+	uint8_t ActiveThreads() const { return activeThreads; } // returns active thread count
+	
 
 	template <typename F, typename... Args>
-	void AddTask(F&& f, Args&&... args)
+	inline void AddTask(F&& f, Args&&... args) // adds a function to the task queue for threads to execute
 	{
+		std::lock_guard<std::mutex> lock(mutex);
 		taskQueue.emplace(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-		cv.notify_one();
 	}
+
+	inline void WaitForComplete() // wait for all current tasks to be done before continuing
+	{
+		while (!taskQueue.empty()) std::this_thread::yield();
+	}
+	 
 
 private:
 
 	void Worker()
-	{
-		std::function<void()> task;
-		while (true)
+	{	
+		std::function<void()> task = nullptr;
+		while (running)
 		{
 			{
-				std::unique_lock<std::mutex> lock(mutex);
-				cv.wait(lock, [this]() {
-					return stopped || !taskQueue.empty();
-				});
-
-				if (stopped && taskQueue.empty()) break;
+				std::lock_guard<std::mutex> lock(mutex);
 				if (taskQueue.empty()) continue;
-
-				task = taskQueue.front();
+				task = std::move(taskQueue.front());
 				taskQueue.pop();
 			}
-			task();
+			if (task == nullptr) std::this_thread::yield();
+			else
+			{
+				task();
+				task = nullptr;
+			}
+
 		}
 	}
 };
