@@ -13,7 +13,8 @@ using std::chrono::milliseconds;
 
 void GenericFunction(int nr);
 
-void RandomNumber(int min, int max);
+template <typename MIN, typename MAX>
+void RandomNumber(MIN min, MAX max);
 
 TaskSystem mt(0);
 
@@ -53,7 +54,8 @@ void GenericFunction(int nr)
 	nr = nr * nr;
 }
 
-void RandomNumber(int min, int max) // generates a random number based on input parameters
+template <typename MIN, typename MAX>
+void RandomNumber(MIN min, MAX max) // generates a random number based on input parameters
 {
 	for (int i = 0; i < 10000; i++)
 	{
