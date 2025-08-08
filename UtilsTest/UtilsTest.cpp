@@ -20,7 +20,7 @@ void GenericFunction(int num, int start, int length);
 TaskSystem mt(30);
 
 int const taskCount = 30;
-int const taskSize = 6000000;
+int const taskSize = 3000000;
 
 double array[taskCount * taskSize];
 
