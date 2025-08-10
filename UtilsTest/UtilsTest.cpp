@@ -36,8 +36,8 @@ int main()
 	t1 = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < taskCount; i++)
 	{
-		RandomNumber(-50000, 50000);
-		//GenericFunction(i, taskSize * i, taskSize);
+		//RandomNumber(-50000, 50000);
+		GenericFunction(i, taskSize * i, taskSize);
 	}
 
 
@@ -63,8 +63,8 @@ int main()
 	t1 = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < taskCount; i++)
 	{
-		mt.AddTask(RandomNumber<int,int>, -50000, 50000);
-		//mt.AddTask(GenericFunction, i, taskSize * i, taskSize);
+		//mt.AddTask(RandomNumber<int,int>, -50000, 50000);
+		mt.AddTask(GenericFunction, i, taskSize * i, taskSize);
 	}
 
 	mt.WaitForComplete();
@@ -82,6 +82,7 @@ int main()
 	std::cout << "Thread Count: " << (int)mt.ActiveThreads() << "/" << (int)mt.MaxThreads() << "\n";
 
 
+	mt.~TaskSystem();
 
 	while (std::cin.get() != '\n');
 }
