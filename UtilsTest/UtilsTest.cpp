@@ -29,8 +29,8 @@ std::vector<int> grids[gridY][gridX];
 int64_t lNumber = 0;
 
 
-std::chrono::steady_clock::time_point t1;
-std::chrono::steady_clock::time_point t2;
+std::chrono::high_resolution_clock::time_point t1;
+std::chrono::high_resolution_clock::time_point t2;
 std::chrono::microseconds singleMS;
 std::chrono::microseconds multiMS;
 
@@ -54,7 +54,7 @@ int main()
 
 
 		t2 = std::chrono::high_resolution_clock::now();
-		singleMS += duration_cast<std::chrono::microseconds>(t2 - t1);
+		singleMS += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
 
 
 
@@ -72,7 +72,7 @@ int main()
 
 		mt.WaitForComplete();
 		t2 = std::chrono::high_resolution_clock::now();
-		multiMS += duration_cast<std::chrono::microseconds>(t2 - t1);
+		multiMS += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
 	}
 
 
