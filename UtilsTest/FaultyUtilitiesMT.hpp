@@ -39,7 +39,7 @@ public:
 		for (int i = 0; i < activeThreads; i++) workers.emplace_back(&TaskSystem::Worker, this);
 	}
 
-	~TaskSystem() // stops all workers threads
+	~TaskSystem() // stops all worker threads
 	{
 		{
 			std::unique_lock<std::mutex> lock(mutex);

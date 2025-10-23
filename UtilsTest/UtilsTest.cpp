@@ -85,8 +85,6 @@ int main()
 	std::cout << "Thread Count: " << (int)mt.ActiveThreads() << "/" << (int)mt.MaxThreads() << "\n";
 
 
-	mt.~TaskSystem();
-
 	while (std::cin.get() != '\n');
 }
 
