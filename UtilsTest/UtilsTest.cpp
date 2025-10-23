@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <atomic>
+//g++ -std=c++20 -Wall -Wextra -pedantic -g -fsanitize=address GridHashTest.cpp -o particles -lsfml-graphics -lsfml-window -lsfml-system
 
 #include "FaultyUtilitiesMT.hpp"
 
