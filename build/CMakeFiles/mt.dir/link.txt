@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/mt.dir/link.d CMakeFiles/mt.dir/UtilsTest.cpp.o -o mt

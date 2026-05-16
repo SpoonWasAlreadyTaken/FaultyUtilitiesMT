@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/home/Spoon/Documents/GitHub/FaultyUtilitiesMT/build",
+  "command": "/usr/bin/c++   -g -std=gnu++20 -o CMakeFiles/mt.dir/UtilsTest.cpp.o -c /home/Spoon/Documents/GitHub/FaultyUtilitiesMT/UtilsTest.cpp",
+  "file": "/home/Spoon/Documents/GitHub/FaultyUtilitiesMT/UtilsTest.cpp",
+  "output": "CMakeFiles/mt.dir/UtilsTest.cpp.o"
+}
+]

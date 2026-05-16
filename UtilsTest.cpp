@@ -1,7 +1,6 @@
 #include <iostream>
 #include <chrono>
 #include <atomic>
-//g++ -std=c++20 -Wall -Wextra -pedantic -g -fsanitize=address GridHashTest.cpp -o particles -lsfml-graphics -lsfml-window -lsfml-system
 
 #include "FaultyUtilitiesMT.hpp"
 
@@ -12,22 +11,16 @@ std::random_device rd;
 
 template <typename MIN, typename MAX>
 void RandomNumber(MIN min, MAX max);
-void ClearGrid(uint32_t start, uint32_t span, uint32_t leftOver);
-void GenericFunction(int num, int start, int length);
+void GenericFunction(size_t start, size_t end, int num);
 
 TaskSystem mt(10);
 
-uint16_t const testCases = 100;
+constexpr float testCases = 100;
 
-int const taskCount = 30;
-int const taskSize = 3000000;
+constexpr int taskCount = 30;
+constexpr int taskSize = 300000;
 
-uint32_t const gridY = 216;
-uint32_t const gridX = 384;
-
-std::vector<int> grids[gridY][gridX];
-
-int64_t lNumber = 0;
+int testArray[taskSize];
 
 
 std::chrono::high_resolution_clock::time_point t1;
@@ -39,18 +32,19 @@ int main()
 {
 	std::cout << "Tasks: " << taskCount << " Task Size: " << taskSize << " Test Cases: " << testCases <<"\n";
 
+    size_t count = taskSize;
+    size_t span = count / taskCount;
 
-	uint32_t count = gridY;
-	uint32_t span = count / mt.ActiveThreads();
-	uint32_t leftOver = count - (span * mt.ActiveThreads());
+    int singleTest = 0;
+    int multiTest = 0;
 
 	for (uint16_t tests = 0; tests < testCases; tests++)
 	{
 		t1 = std::chrono::high_resolution_clock::now();
-		for (uint8_t i = 0; i < mt.ActiveThreads(); i++)
+		for (uint8_t i = 0; i < taskCount; i++)
 		{
 			//RandomNumber(-50000, 50000);
-			ClearGrid(i * span, span, leftOver * (i == mt.ActiveThreads() - 1));
+			GenericFunction(i * span, span, i + 1);
 		}
 
 
@@ -59,21 +53,24 @@ int main()
 
 
 
-
-
+        for (size_t i = 0; i < taskSize; ++i) singleTest += testArray[i];
+        for (size_t i = 0; i < taskSize; ++i) testArray[i] = 0;
 
 
 
 		t1 = std::chrono::high_resolution_clock::now();
-		for (uint8_t i = 0; i < mt.ActiveThreads(); i++)
+		for (uint8_t i = 0; i < taskCount; i++)
 		{
 			//mt.AddTask(RandomNumber<int,int>, -50000, 50000);
-			mt.AddTask(ClearGrid, i * span, span, leftOver * (i == mt.ActiveThreads() - 1));
+			mt.AddTask(GenericFunction, i * span, span, i + 1);
 		}
 
 		mt.WaitForComplete();
 		t2 = std::chrono::high_resolution_clock::now();
 		multiMS += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+
+        for (size_t i = 0; i < taskSize; ++i) multiTest += testArray[i];
+        for (size_t i = 0; i < taskSize; ++i) testArray[i] = 0;
 	}
 
 
@@ -82,23 +79,18 @@ int main()
 
 
 	std::cout << "Single Thread Time: " << singleMS.count() / testCases << " ms\n";
+    std::cout << "Single Thread Result: " << singleTest << "\n";
 	std::cout << "Multi Thread Time: " << multiMS.count() / testCases << " ms " << "\n";
+    std::cout << "Multi Thread Result: " << multiTest << "\n";
 	std::cout << "Thread Count: " << (int)mt.ActiveThreads() << "/" << (int)mt.MaxThreads() << "\n";
-
-
-	while (std::cin.get() != '\n');
 }
 
-void GenericFunction(int num, int start, int length)
+void GenericFunction(size_t start, size_t span, int num)
 {
-
+    size_t end = start + span;
+    for (size_t i = start; i < end; ++i) testArray[i] = num;
 }
 
-void ClearGrid(uint32_t start, uint32_t span, uint32_t leftOver)
-{
-	uint32_t end = start + span + leftOver;
-	for (uint32_t y = start; y < end; y++) for (uint32_t x = 0; x < gridX; x++) grids[y][x].clear();
-}
 
 template <typename MIN, typename MAX>
  void RandomNumber(MIN min, MAX max) // generates a random number based on input parameters

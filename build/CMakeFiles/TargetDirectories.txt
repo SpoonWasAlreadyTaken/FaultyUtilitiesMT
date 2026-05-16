@@ -1,0 +1,3 @@
+/home/Spoon/Documents/GitHub/FaultyUtilitiesMT/build/CMakeFiles/mt.dir
+/home/Spoon/Documents/GitHub/FaultyUtilitiesMT/build/CMakeFiles/edit_cache.dir
+/home/Spoon/Documents/GitHub/FaultyUtilitiesMT/build/CMakeFiles/rebuild_cache.dir
