@@ -65,6 +65,7 @@ public:
 		    taskQueue.emplace( [func = std::forward<F>(f), ...args = std::forward<Args>(args)]() mutable { func(std::move(args)...); } );
 		    taskCount++;
         }
+
         cv.notify_one();
 	}
 
